@@ -1,3 +1,114 @@
+// Video Modal Functionality
+const videoModal = document.getElementById('videoModal');
+const demoVideo = document.getElementById('demoVideo');
+const videoTitle = document.getElementById('videoTitle');
+const videoDescription = document.getElementById('videoDescription');
+const closeVideoModal = document.getElementById('closeVideoModal');
+
+// Open video modal function
+function openVideoModal(videoSrc, title, description) {
+    if (videoModal && demoVideo && videoTitle && videoDescription) {
+        // Show loading state
+        const videoLoading = document.getElementById('videoLoading');
+        if (videoLoading) {
+            videoLoading.classList.remove('hidden');
+        }
+        let finalVideoSrc = '';
+        if(videoSrc.includes('https://')){
+            finalVideoSrc = videoSrc;
+        }else{
+            finalVideoSrc = `assets/Videos/${videoSrc}`;
+        }
+
+        
+        // Set video source
+        demoVideo.src = finalVideoSrc;
+        
+        // Set title and description
+        videoTitle.textContent = title;
+        videoDescription.textContent = description;
+        
+        // Show modal with retro animation
+        videoModal.classList.remove('hidden');
+        videoModal.classList.add('flex');
+        
+        // Add retro glow effect
+        videoModal.style.animation = 'retroGlow 0.5s ease-in-out';
+        
+        // Prevent background scroll
+        document.body.style.overflow = 'hidden';
+        
+        // Focus on video for accessibility
+        demoVideo.focus();
+        
+        // Hide loading when video can play
+        demoVideo.addEventListener('canplay', function() {
+            if (videoLoading) {
+                videoLoading.classList.add('hidden');
+            }
+        }, { once: true });
+        
+        // Hide loading on error
+        demoVideo.addEventListener('error', function() {
+            if (videoLoading) {
+                videoLoading.classList.add('hidden');
+            }
+            
+            // Show fallback for Google Drive links
+            if (videoSrc.includes('drive.google.com')) {
+                const videoFallback = document.getElementById('videoFallback');
+                const videoDirectLink = document.getElementById('videoDirectLink');
+                if (videoFallback && videoDirectLink) {
+                    videoFallback.classList.remove('hidden');
+                    videoDirectLink.href = videoSrc;
+                }
+            }
+            
+            console.error('Video failed to load:', finalVideoSrc);
+        }, { once: true });
+    }
+}
+
+// Close video modal function
+function closeVideoModalFunc() {
+    if (videoModal && demoVideo) {
+        // Pause video
+        demoVideo.pause();
+        demoVideo.currentTime = 0;
+        
+        // Hide modal
+        videoModal.classList.add('hidden');
+        videoModal.classList.remove('flex');
+        
+        // Restore background scroll
+        document.body.style.overflow = 'auto';
+        
+        // Remove animation
+        videoModal.style.animation = '';
+    }
+}
+
+// Event listeners for video modal
+if (closeVideoModal) {
+    closeVideoModal.addEventListener('click', closeVideoModalFunc);
+}
+
+// Close modal when clicking outside
+if (videoModal) {
+    videoModal.addEventListener('click', (e) => {
+        if (e.target === videoModal) {
+            closeVideoModalFunc();
+        }
+    });
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && videoModal && !videoModal.classList.contains('hidden')) {
+        closeVideoModalFunc();
+    }
+});
+
 // Custom Cursor Logic
 const cursor = document.querySelector('.cursor');
 const cursorFollower = document.querySelector('.cursor-follower');
